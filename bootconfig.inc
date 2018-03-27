@@ -1,4 +1,4 @@
-; Copyright (c) 2002-2009,  Microchip Technology Inc.
+; Copyright (c) 2002-2011,  Microchip Technology Inc.
 ;
 ; Microchip licenses this software to you solely for use with Microchip
 ; products.  The software is owned by Microchip and its licensors, and
@@ -23,7 +23,16 @@
 ; OF THESE TERMS.
 
 #define USE_SOFTBOOTWP          ; enable software boot block write protection
+;#define USE_MAX_INTOSC          ; Sets OSCCON<IRCF3:IRCF0> for maximum INTOSC frequency (16MHz)
+;#define USE_PLL                 ; Sets OSCCON.SPLLEN bit at start up for frequency multiplication.
 ;#define INVERT_UART             ; If you don't have an RS232 transceiver, you might want this option
+;#define USE_ALTERNATE_PINS      ; Sets APFCON<RXDTSEL> and APFCON<TXCKSEL> for alternate UART pin usage
+
+; Most devices have the UART on TX/RC6 and RX/RC7 pins (default unless explicitly specified here).
+;#define RXPORT  PORTC
+;#define RXPIN   RC7
+;#define TXTRIS  TRISC
+;#define TXPIN   RC6
 
 ; Bootloader must start at the beginning of a FLASH erase block. If unspecified,
 ; bootloader will automatically be located at the end of program memory address space.
@@ -40,11 +49,17 @@
   #endif
 #endif
 
+#ifndef AppVector 
+    ; The application startup GOTO instructions will be written just before the Boot Block,
+    ; courtesy of the host PC bootloader application.
+    #define AppVector (BootloaderStart-.5)
+#endif
+
 ; Because we need to know the total size of the bootloader before the assembler has finished
 ; compiling the source code, you must estimate the final bootloader size and write it down 
 ; here ahead of time. This number is in words (one word per instruction).
 #define BOOTLOADERSIZE  .434
 
 #define MAJOR_VERSION   .1              ; Bootloader Firmware Version
-#define MINOR_VERSION   .3
+#define MINOR_VERSION   .5
 
